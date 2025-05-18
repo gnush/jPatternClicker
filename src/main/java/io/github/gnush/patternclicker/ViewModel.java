@@ -17,7 +17,7 @@ public class ViewModel {
     public final DoubleProperty clickY = new SimpleDoubleProperty(0.0d);
     public final StringProperty clickButton = new SimpleStringProperty("");
 
-    public final ListProperty<MouseEvent> recordedClicks = new SimpleListProperty<>(FXCollections.observableArrayList());
+    public final ListProperty<MouseClick> recordedClicks = new SimpleListProperty<>(FXCollections.observableArrayList());
 
     private boolean replaying = false;
     private final StringProperty replayButtonText = new SimpleStringProperty(START_REPLAY_TEXT);

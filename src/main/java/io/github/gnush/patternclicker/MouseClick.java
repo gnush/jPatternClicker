@@ -2,7 +2,7 @@ package io.github.gnush.patternclicker;
 
 import javafx.scene.input.MouseButton;
 
-public record MouseEvent(
+public record MouseClick(
         MouseButton button,
         int x,
         int y,

@@ -96,10 +96,10 @@ public class ScreenBuilder implements Builder<Region> {
     }
 
     private VBox createMouseEventList() {
-        ListView<MouseEvent> recordedEventsDisplay = new ListView<>();
+        ListView<MouseClick> recordedEventsDisplay = new ListView<>();
         recordedEventsDisplay.itemsProperty().bind(viewModel.recordedClicks);
         recordedEventsDisplay.getItems().addListener(
-                (ListChangeListener<MouseEvent>) event ->
+                (ListChangeListener<MouseClick>) event ->
                         recordedEventsDisplay.scrollTo(recordedEventsDisplay.getItems().size()-1)
         );
 

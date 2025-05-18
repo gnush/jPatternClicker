@@ -41,7 +41,7 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
     public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
         long delay = lastRecordedClickTimestamp <0 ? 0 : Math.max(System.currentTimeMillis()- lastRecordedClickTimestamp, 0);
 
-        var event = new io.github.gnush.patternclicker.MouseEvent(
+        var event = new MouseClick(
                 MouseButtonTranslator.fromNative(nativeEvent.getButton()).orElse(MouseButton.PRIMARY),
                 nativeEvent.getX() + viewModel.primaryMonitorOffset.x(),
                 nativeEvent.getY() + viewModel.primaryMonitorOffset.y(),
