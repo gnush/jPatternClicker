@@ -7,13 +7,20 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.geometry.Point2D;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 // TODO
+//  - explore exception on closing after replaying
 //  - save button to save the recording
 //  - load button to load a saved recording
 public class MainApp extends Application implements NativeMouseInputListener, NativeKeyListener {
@@ -85,49 +92,44 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
             ));
         }
 
-        Robot bot = new Robot();
-
         Region root = new ScreenBuilder(
                 viewModel,
                 () -> { // record action
                     firstClickAfterRecording = true;
                 },
                 () -> { // replay action
-//                    // replay pattern
-//                    bot.mouseMove(new Point2D(100, 200));
-//                    bot.mouseClick(MouseButton.PRIMARY);
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException _) {}
-//                    bot.keyType(KeyCode.K);
-//                    bot.mouseMove(new Point2D(500, 200));
+                    Robot bot = new Robot();
+                    long delay = 1000L;
+
+                    TimerTask task = new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (viewModel.isReplaying()) {
+                                viewModel.recordedClicks.forEach(click -> {
+                                    try {
+                                        Thread.sleep(click.delayMillis());
+                                    } catch (InterruptedException ignored) {}
+
+                                    Platform.runLater(() -> {
+                                        bot.mouseMove(new Point2D(click.x(), click.y()));
+                                        bot.mouseClick(click.button());
+                                    });
+                                });
+                                try {
+                                    Thread.sleep(delay);
+                                } catch (InterruptedException ignored) {}
+                            }
+                        }
+                    };
+
+                    Timer timer = new Timer("pattern replay");
+                    timer.scheduleAtFixedRate(task, 0, delay);
                 },
                 () -> { // clear action
                     viewModel.recordedClicks.clear();
                     lastRecordedClickTimestamp = -1;
                 }
         ).build();
-
-//        // only works when inside window
-//        // look into: https://stackoverflow.com/questions/2419555/how-to-obtain-mouse-click-coordinates-outside-my-window-in-java
-//        //            https://github.com/kwhat/jnativehook
-//        root.addEventFilter(
-//                MouseEvent.MOUSE_MOVED, e -> {
-//                    model.mouseX.setValue(e.getScreenX());
-//                    model.mouseY.setValue(e.getScreenY());
-//                }
-//        );
-//
-//        root.addEventFilter(
-//                MouseEvent.MOUSE_CLICKED, e -> {
-//                    model.javaClickX.setValue(e.getX());
-//                    model.javaClickY.setValue(e.getY());
-//
-//                    model.javaClickType.setValue(e.getButton().name());
-//                }
-//        );
-
-
 
         Scene scene = new Scene(root);
 
