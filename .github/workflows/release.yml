@@ -25,7 +25,7 @@ jobs:
       - name: Build jar
         run: ./gradlew jar
       - name: Rename jar
-        run: mv build/libs/*.jar ${{ env.basename }}-${{ github.ref_name  }}.jar
+        run: mv build/libs/*.jar ${{ env.basename }}-${{ github.ref_name }}.jar
       - name: Github Release
         uses: softprops/action-gh-release@v2.2.1
         if: github.ref_type == 'tag'
