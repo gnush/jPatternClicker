@@ -30,7 +30,7 @@ jobs:
       - name: Build jar
         run: ./gradlew jar
       - name: Rename jar
-        run: mv build/libs/jPatternClicker-*.jar jPatternClicker-${{ env.today }}.jar
+        run: mv build/libs/${{ env.basename }}-*.jar ${{ env.basename }}-${{ env.today }}.jar
       - name: Release dev build # TODO: look into used workflow and see if we can eliminate the warning
         uses: marvinpinto/action-automatic-releases@v1.2.1
         with:
@@ -39,4 +39,4 @@ jobs:
           prerelease: true
           title: "Development Build"
           files: |
-            jPatternClicker-${{ env.today }}.jar
+            ${{ env.basename }}-${{ env.today }}.jar
