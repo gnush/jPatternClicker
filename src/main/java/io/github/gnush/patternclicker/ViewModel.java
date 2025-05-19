@@ -33,12 +33,6 @@ public class ViewModel {
     private boolean recording = false;
     private final StringProperty recordButtonText = new SimpleStringProperty(START_RECORD_TEXT);
 
-    public final PrimaryMonitorOffset primaryMonitorOffset;
-
-    public ViewModel(PrimaryMonitorOffset primaryMonitorOffset) {
-        this.primaryMonitorOffset = primaryMonitorOffset;
-    }
-
     public void startReplay() {
         replaying = true;
         replayButtonText.setValue(STOP_REPLAY_TEXT);
@@ -51,7 +45,6 @@ public class ViewModel {
             protected Void call() {
                 while (!isCancelled()) {
                     for (MouseClick click: recordedClicks) {
-                        System.out.println(click);
                         try {
                             Thread.sleep(click.delayMillis());
                         } catch (InterruptedException ignored) {

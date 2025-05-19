@@ -19,7 +19,9 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
     private boolean firstClickAfterRecording = true; // to be able to filter (not record) the initial click on start recording, needed since we use release events
     private long lastRecordedClickTimestamp = -1;
 
-    ViewModel viewModel = new ViewModel(new PrimaryMonitorOffset(0, 0));
+    ViewModel viewModel = new ViewModel();
+
+    PrimaryMonitorOffset primaryDisplayOffset = new PrimaryMonitorOffset(0, 0);
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
@@ -30,8 +32,8 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
     @Override
     public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
-        viewModel.mouseX.setValue(nativeEvent.getX() + viewModel.primaryMonitorOffset.x());
-        viewModel.mouseY.setValue(nativeEvent.getY() + viewModel.primaryMonitorOffset.y());
+        viewModel.mouseX.setValue(nativeEvent.getX() + primaryDisplayOffset.x());
+        viewModel.mouseY.setValue(nativeEvent.getY() + primaryDisplayOffset.y());
     }
 
     // LIMITATIONS:
@@ -42,8 +44,8 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
         var event = new MouseClick(
                 MouseButtonTranslator.fromNative(nativeEvent.getButton()).orElse(MouseButton.PRIMARY),
-                nativeEvent.getX() + viewModel.primaryMonitorOffset.x(),
-                nativeEvent.getY() + viewModel.primaryMonitorOffset.y(),
+                nativeEvent.getX() + primaryDisplayOffset.x(),
+                nativeEvent.getY() + primaryDisplayOffset.y(),
                 delay
         );
 
@@ -62,6 +64,11 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
     @Override
     public void start(Stage stage) {
+        primaryDisplayOffset = new PrimaryMonitorOffset(
+                GlobalScreen.getNativeMonitors()[0].getX(),
+                GlobalScreen.getNativeMonitors()[0].getY()
+        );
+
         try {
             GlobalScreen.registerNativeHook();
         } catch (NativeHookException e) {
@@ -78,10 +85,7 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
         // Offset of the primary display (when another display is arranged left of the primary one)
         if (GlobalScreen.getNativeMonitors().length > 0) {
-            viewModel = new ViewModel(new PrimaryMonitorOffset(
-                    GlobalScreen.getNativeMonitors()[0].getX(),
-                    GlobalScreen.getNativeMonitors()[0].getY()
-            ));
+            viewModel = new ViewModel();
         }
 
         Region root = new ScreenBuilder(
