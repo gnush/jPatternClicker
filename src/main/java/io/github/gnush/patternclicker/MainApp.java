@@ -7,20 +7,12 @@ import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
 import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
 import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.geometry.Point2D;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
-import javafx.scene.robot.Robot;
 import javafx.stage.Stage;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 // TODO
-//  - explore exception on closing after replaying
 //  - save button to save the recording
 //  - load button to load a saved recording
 public class MainApp extends Application implements NativeMouseInputListener, NativeKeyListener {
@@ -98,32 +90,6 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
                     firstClickAfterRecording = true;
                 },
                 () -> { // replay action
-                    Robot bot = new Robot();
-                    long delay = 1000L;
-
-                    TimerTask task = new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (viewModel.isReplaying()) {
-                                viewModel.recordedClicks.forEach(click -> {
-                                    try {
-                                        Thread.sleep(click.delayMillis());
-                                    } catch (InterruptedException ignored) {}
-
-                                    Platform.runLater(() -> {
-                                        bot.mouseMove(new Point2D(click.x(), click.y()));
-                                        bot.mouseClick(click.button());
-                                    });
-                                });
-                                try {
-                                    Thread.sleep(delay);
-                                } catch (InterruptedException ignored) {}
-                            }
-                        }
-                    };
-
-                    Timer timer = new Timer("pattern replay");
-                    timer.scheduleAtFixedRate(task, 0, delay);
                 },
                 () -> { // clear action
                     viewModel.recordedClicks.clear();
@@ -144,6 +110,8 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
     @Override
     public void stop() {
+        viewModel.stopReplay();
+
         try {
             GlobalScreen.unregisterNativeHook();
         } catch (NativeHookException e) {

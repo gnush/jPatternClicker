@@ -1,9 +1,14 @@
 package io.github.gnush.patternclicker;
 
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
+import javafx.scene.robot.Robot;
 
 public class ViewModel {
+    private Task<Void> task;
+
     private static final String START_RECORD_TEXT = "Start Recording";
     private static final String STOP_RECORD_TEXT = "Stop Recording";
 
@@ -16,6 +21,9 @@ public class ViewModel {
     public final DoubleProperty clickX = new SimpleDoubleProperty(0.0d);
     public final DoubleProperty clickY = new SimpleDoubleProperty(0.0d);
     public final StringProperty clickButton = new SimpleStringProperty("");
+
+    public final long defaultRepetitionDelay = 1000L;
+    public final StringProperty repetitionDelay = new SimpleStringProperty(String.valueOf(defaultRepetitionDelay));
 
     public final ListProperty<MouseClick> recordedClicks = new SimpleListProperty<>(FXCollections.observableArrayList());
 
@@ -34,11 +42,50 @@ public class ViewModel {
     public void startReplay() {
         replaying = true;
         replayButtonText.setValue(STOP_REPLAY_TEXT);
+
+        task = new Task<>() {
+            final Robot bot = new Robot();
+
+            @SuppressWarnings("BusyWait")
+            @Override
+            protected Void call() {
+                while (!isCancelled()) {
+                    for (MouseClick click: recordedClicks) {
+                        System.out.println(click);
+                        try {
+                            Thread.sleep(click.delayMillis());
+                        } catch (InterruptedException ignored) {
+                            break;
+                        }
+
+                        Platform.runLater(() -> {
+                            bot.mouseMove(click.asPoint());
+                            bot.mouseClick(click.button());
+                        });
+                    }
+
+                    try {
+                        Thread.sleep(loopDelay());
+                    } catch (InterruptedException ignored) {
+                        break;
+                    }
+                }
+
+                return null;
+            }
+        };
+
+        Thread thread = new Thread(task);
+        thread.setDaemon(true);
+        thread.start();
     }
 
     public void stopReplay() {
         replaying = false;
         replayButtonText.setValue(START_REPLAY_TEXT);
+
+        if (task != null)
+            task.cancel();
     }
 
     public void toggleReplay() {
@@ -54,6 +101,15 @@ public class ViewModel {
 
     public StringProperty replayButtonProperty() {
         return replayButtonText;
+    }
+
+    private long loopDelay() {
+        long delay = defaultRepetitionDelay;
+        try {
+            delay = Long.parseLong(repetitionDelay.getValue());
+        } catch (NumberFormatException ignored) { }
+
+        return delay;
     }
 
     public void startRecording() {

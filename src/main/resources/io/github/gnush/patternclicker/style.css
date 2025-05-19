@@ -16,7 +16,7 @@
 
 .label-text {
     -fx-font-family : -theme-font-family;
-    -fx-font-size: 16;
+    -fx-font-size: 14;
     -fx-fill: -theme-colour;
     -fx-font-weight: bold;
 }

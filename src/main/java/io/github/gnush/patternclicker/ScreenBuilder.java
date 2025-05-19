@@ -79,18 +79,21 @@ public class ScreenBuilder implements Builder<Region> {
         GridPane grid = createTwoColumGridPane();
         grid.setMinWidth(250);
 
-        grid.add(createPromptText("Mouse X:"), 0, 0);
-        grid.add(createPromptText(viewModel.mouseX), 1, 0);
-        grid.add(createPromptText("Mouse Y:"), 0, 1);
-        grid.add(createPromptText(viewModel.mouseY), 1, 1);
+        grid.add(createPromptText("Loop delay (ms):"), 0, 0);
+        grid.add(createInputField(viewModel.repetitionDelay), 1, 0);
 
-        grid.add(createPromptText("Click X:"), 0, 2);
-        grid.add(createPromptText(viewModel.clickX), 1, 2);
-        grid.add(createPromptText("Click Y:"), 0, 3);
-        grid.add(createPromptText(viewModel.clickY), 1, 3);
+        grid.add(createPromptText("Mouse X:"), 0, 1);
+        grid.add(createPromptText(viewModel.mouseX), 1, 1);
+        grid.add(createPromptText("Mouse Y:"), 0, 2);
+        grid.add(createPromptText(viewModel.mouseY), 1, 2);
 
-        grid.add(createPromptText("Click:"), 0, 4);
-        grid.add(createPromptText(viewModel.clickButton), 1, 4);
+        grid.add(createPromptText("Click X:"), 0, 3);
+        grid.add(createPromptText(viewModel.clickX), 1, 3);
+        grid.add(createPromptText("Click Y:"), 0, 4);
+        grid.add(createPromptText(viewModel.clickY), 1, 4);
+
+        grid.add(createPromptText("Click:"), 0, 5);
+        grid.add(createPromptText(viewModel.clickButton), 1, 5);
 
         return grid;
     }

@@ -27,6 +27,13 @@ public final class Widgets {
         return result;
     }
 
+    public static TextField createInputField(StringProperty binding) {
+        TextField result = new TextField();
+        result.setMaxWidth(100);
+        result.textProperty().bindBidirectional(binding);
+        return result;
+    }
+
     public static Text createPromptText(String prompt) {
         Text result = new Text(prompt);
         result.maxWidth(100);
