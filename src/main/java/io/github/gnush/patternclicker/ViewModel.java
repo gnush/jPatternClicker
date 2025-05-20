@@ -95,7 +95,7 @@ public class ViewModel {
         replaying = false;
         replayButtonText.setValue(START_REPLAY_TEXT);
 
-        if (task != null)
+        if (task != null && task.isRunning())
             task.cancel();
     }
 
