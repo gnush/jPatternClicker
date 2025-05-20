@@ -43,8 +43,12 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
     @Override
     public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-        if (viewModel.isReplaying() && nativeEvent.getKeyCode() == NativeKeyEvent.VC_ESCAPE) {
+        if (viewModel.isReplaying() && nativeEvent.getKeyCode() == NativeKeyEvent.VC_CONTROL) {
             viewModel.stopReplay();
+        }
+
+        if (viewModel.isRecording() && nativeEvent.getKeyCode() == NativeKeyEvent.VC_CONTROL) {
+            viewModel.stopRecording();
         }
     }
 

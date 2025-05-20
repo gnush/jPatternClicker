@@ -28,10 +28,10 @@ public class ViewModel {
     private Task<Void> task;
 
     private static final String START_RECORD_TEXT = "Start Recording";
-    private static final String STOP_RECORD_TEXT = "Stop Recording";
+    private static final String STOP_RECORD_TEXT = "Stop (<CTRL>)";
 
     private static final String START_REPLAY_TEXT = "Replay Pattern";
-    private static final String STOP_REPLAY_TEXT = "Stop (<ESC>)";
+    private static final String STOP_REPLAY_TEXT = "Stop (<CTRL>)";
 
     public final DoubleProperty mouseX = new SimpleDoubleProperty(0.0d);
     public final DoubleProperty mouseY = new SimpleDoubleProperty(0.0d);
