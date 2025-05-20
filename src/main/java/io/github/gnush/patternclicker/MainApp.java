@@ -20,77 +20,21 @@ package io.github.gnush.patternclicker;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyEvent;
-import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;
-import com.github.kwhat.jnativehook.mouse.NativeMouseEvent;
-import com.github.kwhat.jnativehook.mouse.NativeMouseInputListener;
+import io.github.gnush.patternclicker.listener.NativeMouseListener;
+import io.github.gnush.patternclicker.listener.NativeHotKeyListener;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
 // TODO
 //  - save button to save the recording
 //  - load button to load a saved recording
-public class MainApp extends Application implements NativeMouseInputListener, NativeKeyListener {
-    private boolean firstClickAfterRecording = true; // to be able to filter (not record) the initial click on start recording, needed since we use release events
-    private long lastRecordedClickTimestamp = -1;
-
-    ViewModel viewModel = new ViewModel();
-
-    PrimaryMonitorOffset primaryDisplayOffset = new PrimaryMonitorOffset(0, 0);
-
-    @Override
-    public void nativeKeyPressed(NativeKeyEvent nativeEvent) {
-        if (viewModel.isReplaying() && nativeEvent.getKeyCode() == NativeKeyEvent.VC_CONTROL) {
-            viewModel.stopReplay();
-        }
-
-        if (viewModel.isRecording() && nativeEvent.getKeyCode() == NativeKeyEvent.VC_CONTROL) {
-            viewModel.stopRecording();
-        }
-    }
-
-    @Override
-    public void nativeMouseMoved(NativeMouseEvent nativeEvent) {
-        viewModel.mouseX.setValue(nativeEvent.getX() + primaryDisplayOffset.x());
-        viewModel.mouseY.setValue(nativeEvent.getY() + primaryDisplayOffset.y());
-    }
-
-    // LIMITATIONS:
-    // - native click event not super reliable, detect release events (may track press and release events later to support long clicks)
-    @Override
-    public void nativeMouseReleased(NativeMouseEvent nativeEvent) {
-        long delay = lastRecordedClickTimestamp <0 ? 0 : Math.max(System.currentTimeMillis()- lastRecordedClickTimestamp, 0);
-
-        var event = new MouseClick(
-                MouseButtonTranslator.fromNative(nativeEvent.getButton()).orElse(MouseButton.PRIMARY),
-                nativeEvent.getX() + primaryDisplayOffset.x(),
-                nativeEvent.getY() + primaryDisplayOffset.y(),
-                delay
-        );
-
-        viewModel.clickX.setValue(event.x());
-        viewModel.clickY.setValue(event.y());
-        viewModel.clickButton.setValue(event.button().name());
-
-        if (viewModel.isRecording() && !firstClickAfterRecording) {
-            viewModel.recordedClicks.add(event);
-            lastRecordedClickTimestamp = System.currentTimeMillis();
-        }
-
-        if (firstClickAfterRecording)
-            firstClickAfterRecording = false;
-    }
+public class MainApp extends Application {
+    private final ViewModel viewModel = new ViewModel();
 
     @Override
     public void start(Stage stage) {
-        primaryDisplayOffset = new PrimaryMonitorOffset(
-                GlobalScreen.getNativeMonitors()[0].getX(),
-                GlobalScreen.getNativeMonitors()[0].getY()
-        );
-
         try {
             GlobalScreen.registerNativeHook();
         } catch (NativeHookException e) {
@@ -101,25 +45,22 @@ public class MainApp extends Application implements NativeMouseInputListener, Na
 
         GlobalScreen.setEventDispatcher(new PlatformDispatchService());
 
-        GlobalScreen.addNativeMouseMotionListener(this);
-        GlobalScreen.addNativeMouseListener(this);
-        GlobalScreen.addNativeKeyListener(this);
+        var clickListener = new NativeMouseListener(viewModel);
 
-        // Offset of the primary display (when another display is arranged left of the primary one)
-        if (GlobalScreen.getNativeMonitors().length > 0) {
-            viewModel = new ViewModel();
-        }
+        GlobalScreen.addNativeMouseMotionListener(clickListener);
+        GlobalScreen.addNativeMouseListener(clickListener);
+        GlobalScreen.addNativeKeyListener(new NativeHotKeyListener(viewModel));
 
+        // record action
         Region root = new ScreenBuilder(
                 viewModel,
-                () -> { // record action
-                    firstClickAfterRecording = true;
-                },
+                // record action
+                clickListener::resetFirstClickRecording,
                 () -> { // replay action
                 },
                 () -> { // clear action
                     viewModel.recordedClicks.clear();
-                    lastRecordedClickTimestamp = -1;
+                    clickListener.resetClickDelay();
                 }
         ).build();
 

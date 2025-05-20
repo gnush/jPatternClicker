@@ -16,9 +16,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package io.github.gnush.patternclicker;
+package io.github.gnush.patternclicker.data;
 
-public record PrimaryMonitorOffset(
+import javafx.geometry.Point2D;
+import javafx.scene.input.MouseButton;
+
+public record MouseClick(
+        MouseButton button,
         int x,
-        int y
-) { }
+        int y,
+        long delayMillis
+) {
+    @Override
+    public String toString() {
+        return button.toString() + " (" + x + "," +  y + ") " + delayMillis + "ms";
+    }
+
+    public Point2D asPoint() {
+        return new Point2D(x, y);
+    }
+}

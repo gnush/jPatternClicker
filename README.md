@@ -6,7 +6,7 @@ Record Mouse Click Patterns and replay them to give your carpal tunnel some rest
 
 * Java >= 21
 
-## Error: JavaFX runtime components are missing, and are required to run this application
+### Error: JavaFX runtime components are missing, and are required to run this application
 
 Install a JDK that bundles JavaFX or install OpenJFX
 

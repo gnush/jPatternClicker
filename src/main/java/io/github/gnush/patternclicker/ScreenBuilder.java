@@ -18,6 +18,7 @@
 
 package io.github.gnush.patternclicker;
 
+import io.github.gnush.patternclicker.data.MouseClick;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;

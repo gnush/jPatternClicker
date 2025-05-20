@@ -18,6 +18,7 @@
 
 package io.github.gnush.patternclicker;
 
+import io.github.gnush.patternclicker.data.MouseClick;
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
