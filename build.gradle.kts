@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.gnush"
-version = "1.0.0"
+version = "1.0.1"
 
 val mainClassName = "io.github.gnush.patternclicker.MainApp"
 val launcherClass = "io.github.gnush.patternclicker.Launcher"
