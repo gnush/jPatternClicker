@@ -21,9 +21,9 @@ package io.github.gnush.patternclicker;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
 
@@ -122,11 +122,26 @@ public class ScreenBuilder implements Builder<Region> {
     }
 
     private VBox createMouseEventList() {
-        ListView<MouseClick> recordedEventsDisplay = new ListView<>();
-        recordedEventsDisplay.itemsProperty().bind(viewModel.recordedClicks);
+        ListView<MouseClick> recordedEventsDisplay = new ListView<>(viewModel.recordedClicks);
+
+        recordedEventsDisplay.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        // Scroll to Last
         recordedEventsDisplay.getItems().addListener(
                 (ListChangeListener<MouseClick>) event ->
                         recordedEventsDisplay.scrollTo(recordedEventsDisplay.getItems().size()-1)
+        );
+
+        // Remove selected items with DEL
+        recordedEventsDisplay.addEventFilter(
+                KeyEvent.KEY_PRESSED, e -> {
+                    if (e.getCode() == KeyCode.DELETE) {
+                        // Cannot use getSelectedItems, since it would also remove non-selected "duplicate" entries
+                        for (int index: recordedEventsDisplay.getSelectionModel().getSelectedIndices().reversed()) {
+                            viewModel.recordedClicks.remove(index);
+                        }
+                    }
+                }
         );
 
         return new VBox(4, createPromptText("Recorded Mouse Events"), recordedEventsDisplay);
