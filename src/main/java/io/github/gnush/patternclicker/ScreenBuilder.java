@@ -65,17 +65,17 @@ public class ScreenBuilder implements Builder<Region> {
         Button recordButton = new Button();
         recordButton.textProperty().bind(viewModel.recordButtonProperty());
         recordButton.setOnAction(event -> {
+            recordAction.run();
             viewModel.stopReplay();
             viewModel.toggleRecording();
-            recordAction.run();
         });
 
         Button replayButton = new Button();
         replayButton.textProperty().bind(viewModel.replayButtonProperty());
         replayButton.setOnAction(event -> {
+            replayAction.run();
             viewModel.stopRecording();
             viewModel.toggleReplay();
-            replayAction.run();
         });
 
         Button clearButton = new Button("Clear All");
