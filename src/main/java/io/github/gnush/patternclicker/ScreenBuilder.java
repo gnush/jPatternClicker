@@ -20,9 +20,9 @@ package io.github.gnush.patternclicker;
 
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.*;
 import javafx.util.Builder;
@@ -56,10 +56,11 @@ public class ScreenBuilder implements Builder<Region> {
     }
 
     private Node createTopButtonRow() {
-        HBox result = new HBox(8);
-        result.setAlignment(Pos.CENTER_LEFT);
+        ButtonBar result = new ButtonBar();
+        result.setButtonMinWidth(100);
         result.setPadding(new Insets(2));
 
+        //Button recordButton = new Button("", createRecordSign()); // would need to dynamically recreate button to remove and re-add to button bar
         Button recordButton = new Button();
         recordButton.textProperty().bind(viewModel.recordButtonProperty());
         recordButton.setOnAction(event -> {
@@ -79,7 +80,11 @@ public class ScreenBuilder implements Builder<Region> {
         Button clearButton = new Button("Clear All");
         clearButton.setOnAction(event -> clearAction.run());
 
-        result.getChildren().addAll(recordButton, clearButton, replayButton);
+        ButtonBar.setButtonData(recordButton, ButtonBar.ButtonData.LEFT);
+        ButtonBar.setButtonData(clearButton, ButtonBar.ButtonData.LEFT);
+        ButtonBar.setButtonData(replayButton, ButtonBar.ButtonData.RIGHT);
+
+        result.getButtons().addAll(recordButton, clearButton, replayButton);
 
         return result;
     }

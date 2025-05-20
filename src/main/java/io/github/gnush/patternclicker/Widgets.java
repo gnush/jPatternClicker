@@ -72,4 +72,22 @@ public final class Widgets {
         result.textProperty().bindBidirectional(binding, new NumberStringConverter());
         return result;
     }
+
+    public static Text createStopSign() {
+        Text text = new Text("⏹");
+        text.getStyleClass().add("stop-sign");
+        return text;
+    }
+
+    public static Text createPlaySign() {
+        Text text = new Text("⏵");
+        text.getStyleClass().add("play-sign");
+        return text;
+    }
+
+    public static Text createRecordSign() {
+        Text text = new Text("⏺");
+        text.getStyleClass().add("record-sign");
+        return text;
+    }
 }
